@@ -1,8 +1,12 @@
 
 #include "circle.h"
+#include "ofApp.h"
+
+using namespace std;
+//using namespace glm;
 
 vector<glm::vec2> Circle::intersect(Circle& c2) {
-    vector<glm::vec2> inters(2);
+    vector<glm::vec2> inters;
     double theta;
     double a;
     auto p1 = getCenter();
@@ -34,9 +38,13 @@ bool Circle::calculate_angle(glm::vec2 location_1, float radius_1, glm::vec2 loc
 
 void Circle::draw() {
     ofFill();
-    ofSetColor(0, 255, 255, 128);
+    ofSetColor(ofColor::yellow, 80);
     ofDrawCircle(x, y, r);
+}
+
+void Circle::drawLine() {
     ofNoFill();
     ofSetColor(0);
     ofDrawCircle(x, y, r);
 }
+

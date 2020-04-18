@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "petal.h"
 
 class ofApp : public ofBaseApp{
 
@@ -22,5 +23,9 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 
       private:
+	  	bool paused;
         int size;
+		int sizeInc;
+		vector<Petal> petals;
+		void generate_flower_of_life(int rounds, int center_x, int center_y, int radius, int angle);
 };

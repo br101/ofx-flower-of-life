@@ -1,21 +1,24 @@
 #pragma once
 
-#include "ofApp.h"
+#include "glm/glm.hpp"
+#include <vector>
 
 class Circle
 {
 public:
     Circle(int x, int y, int rad) : x(x), y(y), r(rad) {}
+    Circle(glm::vec2 c, int r) : x(c[0]), y(c[1]), r(r) {}
 
     void draw();
+    void drawLine();
 
-    vector<glm::vec2> intersect(Circle& c2);
+    std::vector<glm::vec2> intersect(Circle& c2);
 
     glm::vec2 getCenter() {
         return glm::vec2(x, y);
     }
 
-private:
+//private:
     int x;
     int y;
     int r;
