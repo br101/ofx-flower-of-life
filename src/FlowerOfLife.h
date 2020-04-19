@@ -18,9 +18,22 @@ public:
 class FlowerOfLife
 {
 public:
-    FlowerOfLife() {}
+    FlowerOfLife(int center_x, int center_y, int radius, int angle)
+        : center_x(center_x), center_y(center_y), radius(radius), angle(angle) {}
 
-    void generate(int rounds, int center_x, int center_y, int radius, int angle);
+    void generate(int rounds);
 
+    void generateSeed() {
+        generate(1);
+    }
+
+    void generateFlower() {
+        generate(2);
+    }
+
+    int center_x;
+    int center_y;
+    int radius;
+    int angle;
     std::vector<Petal> petals;
 };

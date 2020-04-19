@@ -11,7 +11,7 @@ void ofApp::setup(){
     paused = false;
     size = 80;
     sizeInc = 1;
-    flower.generate(4, 500, 400, 80, 0);
+    flower.generateFlower();
 }
 
 //--------------------------------------------------------------
@@ -33,6 +33,8 @@ void ofApp::draw(){
         ofFill();
         ofSetColor(ofColor::yellow, 50);
         ofDrawCircle(p.getCenter(), size);
+        ofSetColor(0);
+        ofDrawBitmapString(to_string(p.num), p.getCenter());
     }
     for (auto& p : flower.petals) {
         ofNoFill();
