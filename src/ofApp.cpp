@@ -11,7 +11,7 @@ void ofApp::setup(){
     paused = false;
     size = 80;
     sizeInc = 1;
-    generate_flower_of_life(4, 500, 400, 80, 0);
+    flower.generate(4, 500, 400, 80, 0);
 }
 
 //--------------------------------------------------------------
@@ -29,55 +29,15 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofBackground(255);
-    for (auto& p : petals) {
+    for (auto& p : flower.petals) {
         ofFill();
         ofSetColor(ofColor::yellow, 50);
         ofDrawCircle(p.getCenter(), size);
     }
-    for (auto& p : petals) {
+    for (auto& p : flower.petals) {
         ofNoFill();
         ofSetColor(0);
         ofDrawCircle(p.getCenter(), size);
-    }
-}
-
-void ofApp::generate_flower_of_life(int rounds, int center_x, int center_y, int radius, int angle)
-{
-    int num = 1;
-    int intersectWith = 0;
-    petals.push_back(Petal(center_x, center_y, radius, 0, 0));
-    for (int r = 1; r < rounds; r++) {
-        for (int i = 0; i < r * 6; i++) {
-            ofLog(OF_LOG_NOTICE, "round %d num %d i %d", r, num, i);
-            if (r == 1 && i == 0) {
-                /* second circle (number 1, round 1)
-                 * defines the angle of it all */
-                int xoff = glm::cos(glm::radians((float)angle)) * radius;
-                int yoff = glm::sin(glm::radians((float)angle)) * radius;
-                ofLog(OF_LOG_NOTICE, "xoff %d yoff %d ang %d", xoff, yoff, angle);
-                petals.push_back(Petal(center_x + xoff, center_y + yoff, radius, num, r));
-            } else {
-                /* all other circles: intersection of the previous circle
-                 * with the circle to intersect with */
-                Petal& p = petals[num - 1];
-                Petal& p2 = petals[intersectWith];
-                ofLog(OF_LOG_NOTICE, "intersect %d (%d/%d) with %d (%d/%d)",
-                    num-1, p.x, p.y, intersectWith, p2.x, p2.y);
-                auto is = p.intersect(p2);
-                for (auto i : is) {
-                    ofLog(OF_LOG_NOTICE, "  is %f %f", i[0], i[1]);
-                }
-                petals.push_back(Petal(is[0], radius, num, r));
-            }
-            num++;
-
-            /* finding the circle to make the next intersection with */
-            if (i == r * 6 - 1) { // last circle of round
-                intersectWith = intersectWith + 1;
-            } else if (i % r) { // not on 60 degrees angle
-                intersectWith = intersectWith + 1;
-            }
-        }
     }
 }
 

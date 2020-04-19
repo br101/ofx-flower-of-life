@@ -1,6 +1,7 @@
 #pragma once
 
 #include "circle.h"
+#include <vector>
 
 class Petal : public Circle
 {
@@ -12,4 +13,14 @@ public:
 
     int num;
     int round;
+};
+
+class FlowerOfLife
+{
+public:
+    FlowerOfLife() {}
+
+    void generate(int rounds, int center_x, int center_y, int radius, int angle);
+
+    std::vector<Petal> petals;
 };
