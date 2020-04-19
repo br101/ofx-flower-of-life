@@ -8,10 +8,11 @@ void ofApp::setup(){
     ofEnableAntiAliasing();
     ofEnableAlphaBlending();
     ofSetCircleResolution(50);
+    ofSetLineWidth(3);
     paused = true;
     size = 80;
     sizeInc = 1;
-    flower.generateEgg();
+    flower.generateFruit();
 }
 
 //--------------------------------------------------------------
@@ -40,6 +41,13 @@ void ofApp::draw(){
         ofNoFill();
         ofSetColor(0);
         ofDrawCircle(p.getCenter(), size);
+    }
+
+    // metatrons cube - brute
+    for (auto& p : flower.petals) {
+        for (auto& p2 : flower.petals) {
+            ofDrawLine(p.getCenter(), p2.getCenter());
+        }
     }
 }
 

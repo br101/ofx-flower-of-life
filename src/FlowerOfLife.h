@@ -39,6 +39,16 @@ public:
                     petals.end());
     }
 
+    void generateFruit() {
+        generate(4);
+        petals.erase(std::remove_if(petals.begin(), petals.end(),
+                        [](const Petal& p) {
+                            return !(p.round == 0
+                                    || (p.round == 2 && p.num % 2 == 0)
+                                    || (p.round == 4 && p.num % 4 == 0)); }),
+                    petals.end());
+    }
+
     int center_x;
     int center_y;
     int radius;
