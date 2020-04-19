@@ -2,6 +2,7 @@
 
 #include "circle.h"
 #include <vector>
+#include <algorithm>
 
 class Petal : public Circle
 {
@@ -29,6 +30,13 @@ public:
 
     void generateFlower() {
         generate(2);
+    }
+
+    void generateEgg() {
+        generate(2);
+        petals.erase(std::remove_if(petals.begin(), petals.end(),
+                        [](const Petal& p) { return p.round == 2 && p.num % 2 == 0; }),
+                    petals.end());
     }
 
     int center_x;

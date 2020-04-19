@@ -8,10 +8,10 @@ void ofApp::setup(){
     ofEnableAntiAliasing();
     ofEnableAlphaBlending();
     ofSetCircleResolution(50);
-    paused = false;
+    paused = true;
     size = 80;
     sizeInc = 1;
-    flower.generateFlower();
+    flower.generateEgg();
 }
 
 //--------------------------------------------------------------
@@ -46,6 +46,10 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
      if (key == ' ') paused = !paused;
+     if (key == 'r') {
+         paused = true;
+         size = 80;
+     }
 }
 
 //--------------------------------------------------------------
