@@ -6,8 +6,8 @@
 class Circle
 {
 public:
-    Circle(int x, int y, int rad) : x(x), y(y), r(rad) {}
-    Circle(glm::vec2 c, int r) : x(c[0]), y(c[1]), r(r) {}
+    Circle(float x, float y, float rad) : x(x), y(y), r(rad) {}
+    Circle(glm::vec2 c, float r) : x(c[0]), y(c[1]), r(r) {}
 
     void draw();
     void drawLine();
@@ -19,9 +19,9 @@ public:
     }
 
 //private:
-    int x;
-    int y;
-    int r;
+    float x;
+    float y;
+    float r;
 
     bool calculate_angle(glm::vec2 location_1, float radius_1, glm::vec2 location_2, float radius_2, double& theta, double& a);
 };

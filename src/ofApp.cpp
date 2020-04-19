@@ -8,7 +8,7 @@ void ofApp::setup(){
     ofEnableAntiAliasing();
     ofEnableAlphaBlending();
     ofSetCircleResolution(50);
-    ofSetLineWidth(3);
+    ofSetLineWidth(2);
     paused = true;
     size = 80;
     sizeInc = 1;

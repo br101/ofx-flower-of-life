@@ -16,20 +16,20 @@ void FlowerOfLife::generate(int rounds)
             ofLog(OF_LOG_NOTICE, "round %d num #%d i %d", r, num, i);
             if (r == 1 && i == 0) {
                 /* second petal (number 1, round 1) defines the angle of it all */
-                int xoff = glm::cos(glm::radians((float)angle)) * radius;
-                int yoff = glm::sin(glm::radians((float)angle)) * radius;
-                ofLog(OF_LOG_NOTICE, "  xoff %d yoff %d ang %d", xoff, yoff, angle);
+                float xoff = glm::cos(glm::radians((float)angle)) * radius;
+                float yoff = glm::sin(glm::radians((float)angle)) * radius;
+                ofLog(OF_LOG_NOTICE, "  xoff %.2f yoff %.2f ang %d", xoff, yoff, angle);
                 petals.push_back(Petal(center_x + xoff, center_y + yoff, radius, num, r));
             } else {
                 /* all other petals: intersection of the previous petal
                  * with the petal to intersect with */
                 Petal& p = petals[num - 1];
                 Petal& p2 = petals[intersectWith];
-                ofLog(OF_LOG_NOTICE, "  intersect #%d (%d/%d) with #%d (%d/%d)",
+                ofLog(OF_LOG_NOTICE, "  intersect #%d (%.2f/%.2f) with #%d (%.2f/%.2f)",
                     num-1, p.x, p.y, intersectWith, p2.x, p2.y);
                 auto is = p.intersect(p2);
                 for (auto i : is) {
-                    ofLog(OF_LOG_NOTICE, "    is %f %f", i[0], i[1]);
+                    ofLog(OF_LOG_NOTICE, "    is %.2f %.2f", i[0], i[1]);
                 }
                 petals.push_back(Petal(is[1], radius, num, r));
             }
