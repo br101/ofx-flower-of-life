@@ -8,7 +8,7 @@ void ofApp::setup(){
     ofEnableAntiAliasing();
     ofEnableAlphaBlending();
     ofSetCircleResolution(72);
-    ofSetLineWidth(2);
+    ofSetLineWidth(1);
     paused = true;
     size = 80;
     sizeInc = 1;
@@ -31,8 +31,9 @@ void ofApp::update(){
 void ofApp::draw(){
     ofBackground(255);
 
+    // flower: fill
+    ofFill();
     for (auto& p : flower.petals) {
-        ofFill();
         if (p.isPartOfFruit()) {
             ofSetColor(ofColor::orange, 60);
         } else {
@@ -42,16 +43,18 @@ void ofApp::draw(){
         //ofSetColor(0);
         //ofDrawBitmapString(to_string(p.num), p.getCenter());
     }
+
+    // flower: outlines
+    ofNoFill();
+    ofSetColor(128);
+    ofSetLineWidth(1);
     for (auto& p : flower.petals) {
-        ofNoFill();
-        ofSetColor(128);
         ofDrawCircle(p.getCenter(), size);
     }
 
     // metatrons cube - brute
     ofSetColor(0);
     ofSetLineWidth(3);
-    ofNoFill();
     vector<glm::vec2> points = flower.getMetatronsCube();
     for (auto& p : points) {
         for (auto& p2 : points) {
