@@ -7,12 +7,12 @@ void ofApp::setup(){
     ofSetFrameRate(60);
     ofEnableAntiAliasing();
     ofEnableAlphaBlending();
-    ofSetCircleResolution(50);
+    ofSetCircleResolution(72);
     ofSetLineWidth(2);
     paused = true;
     size = 80;
     sizeInc = 1;
-    flower.generateFruit();
+    flower.generate(4);
 }
 
 //--------------------------------------------------------------
@@ -30,25 +30,39 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofBackground(255);
+
     for (auto& p : flower.petals) {
         ofFill();
-        ofSetColor(ofColor::yellow, 50);
+        if (p.isPartOfFruit()) {
+            ofSetColor(ofColor::orange, 60);
+        } else {
+            ofSetColor(ofColor::yellow, 20);
+        }
         ofDrawCircle(p.getCenter(), size);
-        ofSetColor(0);
-        ofDrawBitmapString(to_string(p.num), p.getCenter());
+        //ofSetColor(0);
+        //ofDrawBitmapString(to_string(p.num), p.getCenter());
     }
     for (auto& p : flower.petals) {
         ofNoFill();
-        ofSetColor(0);
+        ofSetColor(128);
         ofDrawCircle(p.getCenter(), size);
     }
 
     // metatrons cube - brute
-    for (auto& p : flower.petals) {
-        for (auto& p2 : flower.petals) {
-            ofDrawLine(p.getCenter(), p2.getCenter());
+    ofSetColor(0);
+    ofSetLineWidth(3);
+    ofNoFill();
+    vector<glm::vec2> points = flower.getMetatronsCube();
+    for (auto& p : points) {
+        for (auto& p2 : points) {
+            ofDrawLine(p, p2);
         }
     }
+
+    // enclosing circle
+    ofDrawCircle(flower.petals[0].getCenter(),
+        glm::distance(flower.petals[0].getCenter(), flower.petals.back().getCenter()) 
+            /*+ flower.petals[0].r*/);
 }
 
 //--------------------------------------------------------------

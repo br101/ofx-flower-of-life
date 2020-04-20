@@ -14,6 +14,16 @@ public:
 
     int num;
     int round;
+
+    bool isPartOfEgg() const {
+        return round < 2 || (round == 2 && num % 2 != 0);
+    }
+
+    bool isPartOfFruit() const {
+        return (round == 0
+                || (round == 2 && num % 2 == 0)
+                || (round == 4 && num % 4 == 0));
+    }
 };
 
 class FlowerOfLife
@@ -35,7 +45,9 @@ public:
     void generateEgg() {
         generate(2);
         petals.erase(std::remove_if(petals.begin(), petals.end(),
-                        [](const Petal& p) { return p.round == 2 && p.num % 2 == 0; }),
+                        [](const Petal& p) {
+                            return !p.isPartOfEgg();
+                        }),
                     petals.end());
     }
 
@@ -43,10 +55,19 @@ public:
         generate(4);
         petals.erase(std::remove_if(petals.begin(), petals.end(),
                         [](const Petal& p) {
-                            return !(p.round == 0
-                                    || (p.round == 2 && p.num % 2 == 0)
-                                    || (p.round == 4 && p.num % 4 == 0)); }),
+                            return !p.isPartOfFruit();
+                        }),
                     petals.end());
+    }
+
+    std::vector<glm::vec2> getMetatronsCube() {
+        std::vector<glm::vec2> points;
+        for (Petal& p : petals) {
+            if (p.isPartOfFruit()) {
+                points.push_back(p.getCenter());
+            }
+        }
+        return points;
     }
 
     int center_x;
