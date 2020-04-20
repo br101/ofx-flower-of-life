@@ -70,11 +70,16 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-     if (key == ' ') paused = !paused;
-     if (key == 'r') {
+    if (key == ' ') paused = !paused;
+    else if (key == 'r') {
          paused = true;
          size = 80;
-     }
+    }
+    else if (key == 's') {
+        ofImage img;
+        img.grabScreen(0, 0 , ofGetWidth(), ofGetHeight());
+        img.save("screenshot.png");
+    }
 }
 
 //--------------------------------------------------------------
