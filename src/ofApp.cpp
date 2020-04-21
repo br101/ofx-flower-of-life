@@ -58,13 +58,13 @@ void ofApp::draw(){
         ofDrawCircle(p.getCenter(), size);
     }
 
-    // metatrons cube - brute
+    // metatrons cube
     ofSetColor(0);
     ofSetLineWidth(3);
     vector<glm::vec2> points = flower.getMetatronsCube();
-    for (auto& p : points) {
-        for (auto& p2 : points) {
-            ofDrawLine(p, p2);
+    for (size_t i = 0; i < points.size(); i++) {
+        for (size_t j = i + 1; j < points.size(); j++) {
+            ofDrawLine(points[i], points[j]);
         }
     }
 
