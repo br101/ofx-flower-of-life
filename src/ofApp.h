@@ -22,6 +22,7 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+		void audioIn(ofSoundBuffer &input);
 
       private:
 	    FlowerOfLife flower;
@@ -29,4 +30,5 @@ class ofApp : public ofBaseApp{
 		bool saveSvg;
         int size;
 		int sizeInc;
+		float smoothedVol;
 };
