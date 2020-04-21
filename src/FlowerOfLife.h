@@ -70,6 +70,19 @@ public:
         return points;
     }
 
+    void setCenter(int x, int y) {
+        center_x = x;
+        center_y = y;
+    }
+
+    void setRadius(int r) {
+        radius = r;
+    }
+
+    void clear() {
+        petals.clear();
+    }
+
     int center_x;
     int center_y;
     int radius;

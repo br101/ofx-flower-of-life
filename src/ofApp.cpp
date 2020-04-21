@@ -11,6 +11,7 @@ void ofApp::setup(){
     ofSetLineWidth(1);
     paused = true;
     saveSvg = false;
+    normSize = 80;
     size = 80;
     sizeInc = 1;
     flower.generate(4);
@@ -22,7 +23,7 @@ void ofApp::setup(){
 void ofApp::update(){
     if (paused) return;
 
-    size = 80 * smoothedVol * 50;
+    size = normSize * smoothedVol * 50;
 /*
     size += sizeInc;
     if (size == 20) {
@@ -93,7 +94,7 @@ void ofApp::keyPressed(int key){
     if (key == ' ') paused = !paused;
     else if (key == 'r') {
          paused = true;
-         size = 80;
+         size = normSize;
     }
     else if (key == 'S') {
         ofImage img;
@@ -131,6 +132,7 @@ void ofApp::audioIn(ofSoundBuffer &input) {
 
     smoothedVol *= 0.93;
     smoothedVol += 0.07 * curVol;
+    //smoothedVol = curVol;
 }
 
 //--------------------------------------------------------------
@@ -170,7 +172,12 @@ void ofApp::mouseExited(int x, int y){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-
+    ofLog(OF_LOG_NOTICE, "resized %d %d", w, h);
+    flower.setCenter(w/2, h/2);
+    normSize = h/2/5;
+    flower.setRadius(normSize);
+    flower.clear();
+    flower.generate(4);
 }
 
 //--------------------------------------------------------------

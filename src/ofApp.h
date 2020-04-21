@@ -28,6 +28,7 @@ class ofApp : public ofBaseApp{
 	    FlowerOfLife flower;
 	  	bool paused;
 		bool saveSvg;
+		int normSize;
         int size;
 		int sizeInc;
 		float smoothedVol;
