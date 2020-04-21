@@ -10,6 +10,7 @@ void ofApp::setup(){
     ofSetCircleResolution(72);
     ofSetLineWidth(1);
     paused = true;
+    saveSvg = false;
     size = 80;
     sizeInc = 1;
     flower.generate(4);
@@ -29,6 +30,11 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+
+    if (saveSvg) {
+        ofBeginSaveScreenAsSVG("flower.svg");
+    }
+
     ofBackground(255);
 
     // flower: fill
@@ -66,6 +72,11 @@ void ofApp::draw(){
     ofDrawCircle(flower.petals[0].getCenter(),
         glm::distance(flower.petals[0].getCenter(), flower.petals.back().getCenter()) 
             /*+ flower.petals[0].r*/);
+
+    if (saveSvg) {
+        ofEndSaveScreenAsSVG();
+        saveSvg = false;
+    }
 }
 
 //--------------------------------------------------------------
@@ -75,10 +86,13 @@ void ofApp::keyPressed(int key){
          paused = true;
          size = 80;
     }
-    else if (key == 's') {
+    else if (key == 'S') {
         ofImage img;
         img.grabScreen(0, 0 , ofGetWidth(), ofGetHeight());
         img.save("screenshot.png");
+    }
+    else if (key == 's') {
+        saveSvg = true;
     }
 }
 

@@ -26,6 +26,7 @@ class ofApp : public ofBaseApp{
       private:
 	    FlowerOfLife flower;
 	  	bool paused;
+		bool saveSvg;
         int size;
 		int sizeInc;
 };
