@@ -2,6 +2,10 @@
 
 #include "ofMain.h"
 #include "FlowerOfLife.h"
+#include "ofxFFmpegRecorder.h"
+#include "ofxBeat.h"
+
+#define HIST_SIZE 200
 
 class ofApp : public ofBaseApp{
 
@@ -32,4 +36,13 @@ class ofApp : public ofBaseApp{
         int size;
 		int sizeInc;
 		float smoothedVol;
+
+		ofFbo mCapFbo;
+		ofPixels mPix;
+		ofxFFmpegRecorder m_Recorder;
+
+		ofxBeat beat;
+		vector<float> histL;
+		vector<float> histM;
+		vector<float> histH;
 };

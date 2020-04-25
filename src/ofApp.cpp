@@ -12,11 +12,16 @@ void ofApp::setup(){
     paused = true;
     saveSvg = false;
     normSize = 80;
-    size = 80;
+    size = normSize;
     sizeInc = 1;
     flower.generate(4);
 
     ofSoundStreamSetup(0, 2); // 2 input channels
+    //ofSoundStreamSetup(0, 1, this, 44100, beat.getBufferSize(), 4);
+
+    mCapFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
+    m_Recorder.setup(true, false, glm::vec2(ofGetWidth(), ofGetHeight()));
+    m_Recorder.setOverWrite(true);
 }
 
 //--------------------------------------------------------------
@@ -24,6 +29,7 @@ void ofApp::update(){
     if (paused) return;
 
     size = normSize * smoothedVol * 50;
+    //size = normSize * beat.kick();
 /*
     size += sizeInc;
     if (size == 20) {
@@ -32,6 +38,17 @@ void ofApp::update(){
         sizeInc = -1;
     }
 */
+    beat.update(ofGetElapsedTimeMillis());
+
+    histL.push_back(beat.kick());
+    histM.push_back(beat.snare());
+    histH.push_back(beat.hihat());
+
+    if (histL.size() >= HIST_SIZE) {
+        histL.erase(histL.begin(), histL.begin()+1);
+        histM.erase(histM.begin(), histM.begin()+1);
+        histH.erase(histH.begin(), histH.begin()+1);
+    }
 }
 
 //--------------------------------------------------------------
@@ -40,6 +57,8 @@ void ofApp::draw(){
     if (saveSvg) {
         ofBeginSaveScreenAsSVG("flower.svg");
     }
+
+    mCapFbo.begin();
 
     ofBackground(255);
 
@@ -86,7 +105,39 @@ void ofApp::draw(){
         saveSvg = false;
     }
 
+#if 0
     ofDrawBitmapString(to_string(smoothedVol), 20, 20);
+    ofDrawBitmapString(to_string(beat.kick()), 20, 40);
+
+    ofSetLineWidth(1);
+	ofBeginShape();
+	for (unsigned int i = 0; i < histL.size(); i++){
+		ofVertex(i*2, 100 - histL[i]*100.0f);
+	}
+	ofEndShape(false);
+
+    ofBeginShape();
+	for (unsigned int i = 0; i < histM.size(); i++){
+		ofVertex(i*2, 200 - histM[i]*100.0f);
+	}
+	ofEndShape(false);
+
+    ofBeginShape();
+	for (unsigned int i = 0; i < histH.size(); i++){
+		ofVertex(i*2, 300 - histH[i]*100.0f);
+	}
+	ofEndShape(false);
+#endif
+
+    mCapFbo.end();
+    mCapFbo.draw(0,0);
+
+    if (m_Recorder.isRecording()) {
+        mCapFbo.readToPixels(mPix);
+        if (mPix.getWidth() > 0 && mPix.getHeight() > 0) {
+            m_Recorder.addFrame(mPix);
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -106,33 +157,24 @@ void ofApp::keyPressed(int key){
     }
     else if (key == 'f') {
         ofToggleFullscreen();
+    } else if (key == 'a') {
+       if( m_Recorder.isRecording() ) {
+            m_Recorder.stop();
+        } else {
+            m_Recorder.setOutputPath(ofToDataPath(ofGetTimestampString() + ".avi", true));
+            m_Recorder.setVideoCodec("libx264");
+            m_Recorder.setBitRate(8000);
+            m_Recorder.startCustomRecord();
+        }
     }
 }
 
 void ofApp::audioIn(ofSoundBuffer &input) {
-    float curVol = 0.0;
-    int numCounted = 0;
-
-    // lets go through each sample and calculate the root mean square
-    // which is a rough way to calculate volume
-    for (size_t i = 0; i < input.getNumFrames(); i++) {
-        float left = input[i * 2] * 0.5;
-        float right = input[i * 2 + 1] * 0.5;
-
-        curVol += left * left;
-        curVol += right * right;
-        numCounted += 2;
-    }
-
-    // this is how we get the mean of rms
-    curVol /= (float)numCounted;
-
-    // this is how we get the root of rms
-    curVol = sqrt(curVol);
-
     smoothedVol *= 0.93;
-    smoothedVol += 0.07 * curVol;
+    smoothedVol += 0.07 * input.getRMSAmplitude();
     //smoothedVol = curVol;
+
+    beat.audioReceived(input.getBuffer().data(), input.size(), input.getNumChannels());
 }
 
 //--------------------------------------------------------------

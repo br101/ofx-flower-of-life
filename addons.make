@@ -1,1 +1,3 @@
 ofxVectorGraphics
+ofxFFmpegRecorder
+ofxBeat
