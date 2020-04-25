@@ -3,85 +3,89 @@
 #include <iostream>
 
 //--------------------------------------------------------------
-void ofApp::setup(){
-    ofSetFrameRate(60);
-    ofEnableAntiAliasing();
-    ofEnableAlphaBlending();
-    ofSetCircleResolution(72);
-    ofSetLineWidth(1);
-    paused = true;
-    saveSvg = false;
-    normSize = 80;
-    size = normSize;
-    sizeInc = 1;
-    flower.generate(4);
+void ofApp::setup()
+{
+	ofSetFrameRate(60);
+	ofEnableAntiAliasing();
+	ofEnableAlphaBlending();
+	ofSetCircleResolution(72);
+	ofSetLineWidth(1);
+	paused = true;
+	saveSvg = false;
+	normSize = 80;
+	size = normSize;
+	sizeInc = 1;
+	flower.generate(4);
 
-    ofSoundStreamSetup(0, 2); // 2 input channels
-    //ofSoundStreamSetup(0, 1, this, 44100, beat.getBufferSize(), 4);
+	ofSoundStreamSetup(0, 2); // 2 input channels
+	// ofSoundStreamSetup(0, 1, this, 44100, beat.getBufferSize(), 4);
 
-    mCapFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
-    m_Recorder.setup(true, false, glm::vec2(ofGetWidth(), ofGetHeight()));
-    m_Recorder.setOverWrite(true);
+	mCapFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
+	m_Recorder.setup(true, false, glm::vec2(ofGetWidth(), ofGetHeight()));
+	m_Recorder.setOverWrite(true);
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
-    if (paused) return;
+void ofApp::update()
+{
+	if (paused)
+		return;
 
-    size = normSize * smoothedVol * 50;
-    //size = normSize * beat.kick();
-/*
-    size += sizeInc;
-    if (size == 20) {
-        sizeInc = 1;
-    } else if (size == 100) {
-        sizeInc = -1;
-    }
-*/
-    beat.update(ofGetElapsedTimeMillis());
+	size = normSize * smoothedVol * 50;
+	// size = normSize * beat.kick();
+	/*
+		size += sizeInc;
+		if (size == 20) {
+			sizeInc = 1;
+		} else if (size == 100) {
+			sizeInc = -1;
+		}
+	*/
+	beat.update(ofGetElapsedTimeMillis());
 
-    histL.push_back(beat.kick());
-    histM.push_back(beat.snare());
-    histH.push_back(beat.hihat());
+	histL.push_back(beat.kick());
+	histM.push_back(beat.snare());
+	histH.push_back(beat.hihat());
 
-    if (histL.size() >= HIST_SIZE) {
-        histL.erase(histL.begin(), histL.begin()+1);
-        histM.erase(histM.begin(), histM.begin()+1);
-        histH.erase(histH.begin(), histH.begin()+1);
-    }
+	if (histL.size() >= HIST_SIZE) {
+		histL.erase(histL.begin(), histL.begin() + 1);
+		histM.erase(histM.begin(), histM.begin() + 1);
+		histH.erase(histH.begin(), histH.begin() + 1);
+	}
 }
 
 //--------------------------------------------------------------
-void ofApp::draw(){
+void ofApp::draw()
+{
 
-    if (saveSvg) {
-        ofBeginSaveScreenAsSVG("flower.svg");
-    }
+	if (saveSvg) {
+		ofBeginSaveScreenAsSVG("flower.svg");
+	}
 
-    mCapFbo.begin();
+	mCapFbo.begin();
 
-    ofBackground(255);
+	ofBackground(255);
 
-    // flower: fill
-    ofFill();
-    for (auto& p : flower.petals) {
-        if (p.isPartOfFruit()) {
-            ofSetColor(ofColor::orange, 60);
-        } else {
-            ofSetColor(ofColor::yellow, 20);
-        }
-        ofDrawCircle(p.getCenter(), size);
-        //ofSetColor(0);
-        //ofDrawBitmapString(to_string(p.num), p.getCenter());
-    }
+	// flower: fill
+	ofFill();
+	for (auto& p : flower.petals) {
+		if (p.isPartOfFruit()) {
+			ofSetColor(ofColor::orange, 60);
+		} else {
+			ofSetColor(ofColor::yellow, 20);
+		}
+		ofDrawCircle(p.getCenter(), size);
+		// ofSetColor(0);
+		// ofDrawBitmapString(to_string(p.num), p.getCenter());
+	}
 
-    // flower: outlines
-    ofNoFill();
-    ofSetColor(128);
-    ofSetLineWidth(1);
-    for (auto& p : flower.petals) {
-        ofDrawCircle(p.getCenter(), size);
-    }
+	// flower: outlines
+	ofNoFill();
+	ofSetColor(128);
+	ofSetLineWidth(1);
+	for (auto& p : flower.petals) {
+		ofDrawCircle(p.getCenter(), size);
+	}
 
 #if 0
     // metatrons cube
@@ -100,10 +104,10 @@ void ofApp::draw(){
             /*+ flower.petals[0].r*/);
 #endif
 
-    if (saveSvg) {
-        ofEndSaveScreenAsSVG();
-        saveSvg = false;
-    }
+	if (saveSvg) {
+		ofEndSaveScreenAsSVG();
+		saveSvg = false;
+	}
 
 #if 0
     ofDrawBitmapString(to_string(smoothedVol), 20, 20);
@@ -129,105 +133,108 @@ void ofApp::draw(){
 	ofEndShape(false);
 #endif
 
-    mCapFbo.end();
-    mCapFbo.draw(0,0);
+	mCapFbo.end();
+	mCapFbo.draw(0, 0);
 
-    if (m_Recorder.isRecording()) {
-        mCapFbo.readToPixels(mPix);
-        if (mPix.getWidth() > 0 && mPix.getHeight() > 0) {
-            m_Recorder.addFrame(mPix);
-        }
-    }
+	if (m_Recorder.isRecording()) {
+		mCapFbo.readToPixels(mPix);
+		if (mPix.getWidth() > 0 && mPix.getHeight() > 0) {
+			m_Recorder.addFrame(mPix);
+		}
+	}
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
-    if (key == ' ') paused = !paused;
-    else if (key == 'r') {
-         paused = true;
-         size = normSize;
-    }
-    else if (key == 'S') {
-        ofImage img;
-        img.grabScreen(0, 0 , ofGetWidth(), ofGetHeight());
-        img.save("screenshot.png");
-    }
-    else if (key == 's') {
-        saveSvg = true;
-    }
-    else if (key == 'f') {
-        ofToggleFullscreen();
-    } else if (key == 'a') {
-       if( m_Recorder.isRecording() ) {
-            m_Recorder.stop();
-        } else {
-            m_Recorder.setOutputPath(ofToDataPath(ofGetTimestampString() + ".avi", true));
-            m_Recorder.setVideoCodec("libx264");
-            m_Recorder.setBitRate(8000);
-            m_Recorder.startCustomRecord();
-        }
-    }
+void ofApp::keyPressed(int key)
+{
+	if (key == ' ')
+		paused = !paused;
+	else if (key == 'r') {
+		paused = true;
+		size = normSize;
+	} else if (key == 'S') {
+		ofImage img;
+		img.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
+		img.save("screenshot.png");
+	} else if (key == 's') {
+		saveSvg = true;
+	} else if (key == 'f') {
+		ofToggleFullscreen();
+	} else if (key == 'a') {
+		if (m_Recorder.isRecording()) {
+			m_Recorder.stop();
+		} else {
+			m_Recorder.setOutputPath(
+				ofToDataPath(ofGetTimestampString() + ".avi", true));
+			m_Recorder.setVideoCodec("libx264");
+			m_Recorder.setBitRate(8000);
+			m_Recorder.startCustomRecord();
+		}
+	}
 }
 
-void ofApp::audioIn(ofSoundBuffer &input) {
-    smoothedVol *= 0.93;
-    smoothedVol += 0.07 * input.getRMSAmplitude();
-    //smoothedVol = curVol;
+void ofApp::audioIn(ofSoundBuffer& input)
+{
+	smoothedVol *= 0.93;
+	smoothedVol += 0.07 * input.getRMSAmplitude();
+	// smoothedVol = curVol;
 
-    beat.audioReceived(input.getBuffer().data(), input.size(), input.getNumChannels());
-}
-
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-
+	beat.audioReceived(input.getBuffer().data(), input.size(),
+					   input.getNumChannels());
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
-
+void ofApp::keyReleased(int key)
+{
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
-
+void ofApp::mouseMoved(int x, int y)
+{
 }
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
-
+void ofApp::mouseDragged(int x, int y, int button)
+{
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
-
+void ofApp::mousePressed(int x, int y, int button)
+{
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
-
+void ofApp::mouseReleased(int x, int y, int button)
+{
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
-
+void ofApp::mouseEntered(int x, int y)
+{
 }
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
-    ofLog(OF_LOG_NOTICE, "resized %d %d", w, h);
-    flower.setCenter(w/2, h/2);
-    normSize = h/2/5;
-    flower.setRadius(normSize);
-    flower.clear();
-    flower.generate(4);
+void ofApp::mouseExited(int x, int y)
+{
 }
 
 //--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
-
+void ofApp::windowResized(int w, int h)
+{
+	ofLog(OF_LOG_NOTICE, "resized %d %d", w, h);
+	flower.setCenter(w / 2, h / 2);
+	normSize = h / 2 / 5;
+	flower.setRadius(normSize);
+	flower.clear();
+	flower.generate(4);
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::gotMessage(ofMessage msg)
+{
+}
 
+//--------------------------------------------------------------
+void ofApp::dragEvent(ofDragInfo dragInfo)
+{
 }
