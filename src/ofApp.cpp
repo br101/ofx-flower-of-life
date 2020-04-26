@@ -14,6 +14,11 @@ void ofApp::setup()
 	saveSvg = false;
 	size = 80;
 	sizeInc = 1;
+	hideGui = false;
+
+	radius.addListener(this, &ofApp::radiusChanged);
+	rounds.addListener(this, &ofApp::roundsChanged);
+	angle.addListener(this, &ofApp::angleChanged);
 
 	flower.setAngle(30);
 	flower.setCenter(ofGetWidth() / 2, ofGetHeight() / 2);
@@ -34,6 +39,16 @@ void ofApp::setup()
 	soundStream.setup(settings);
 
 	mCapFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
+
+	gui.setup("settings");
+	gui.add(radius.set("radius", 80, 10, 300));
+	gui.add(rounds.set("rounds", 4, 1, 50));
+	gui.add(angle.set("angle", 0, 1, 90));
+	gui.add(showMeta.set("metatrons cube", false));
+	gui.add(showEgg.set("show egg", true));
+	gui.add(colFill.set("fill color", ofColor::yellow, ofColor(0,0,0,0), ofColor(255,255,255,255)));
+	gui.add(colEgg.set("egg color", ofColor::orange, ofColor(0,0,0,0), ofColor(255,255,255,255)));
+	gui.add(colOut.set("outline color", ofColor::gray, ofColor(0,0,0,0), ofColor(255,255,255,255)));
 
 	//m_Recorder.setup(true, false, glm::vec2(ofGetWidth(), ofGetHeight()));
 	//m_Recorder.setOverWrite(true);
@@ -83,10 +98,10 @@ void ofApp::draw()
 	// flower: fill
 	ofFill();
 	for (auto& p : flower.petals) {
-		if (p.isPartOfFruit()) {
-			ofSetColor(ofColor::orange, 60);
+		if (showEgg && p.isPartOfFruit()) {
+			ofSetColor(colEgg, 60);
 		} else {
-			ofSetColor(ofColor::yellow, 20);
+			ofSetColor(colFill, 20);
 		}
 		ofDrawCircle(p.getCenter(), size);
 		// ofSetColor(0);
@@ -95,28 +110,29 @@ void ofApp::draw()
 
 	// flower: outlines
 	ofNoFill();
-	ofSetColor(128);
+	ofSetColor(colOut);
 	ofSetLineWidth(1);
 	for (auto& p : flower.petals) {
 		ofDrawCircle(p.getCenter(), size);
 	}
 
-#if 0
-    // metatrons cube
-    ofSetColor(0);
-    ofSetLineWidth(3);
-    vector<glm::vec2> points = flower.getMetatronsCube();
-    for (size_t i = 0; i < points.size(); i++) {
-        for (size_t j = i + 1; j < points.size(); j++) {
-            ofDrawLine(points[i], points[j]);
-        }
-    }
+	if (showMeta) {
+		// metatrons cube
+		ofSetColor(0);
+		ofSetLineWidth(3);
+		vector<glm::vec2> points = flower.getMetatronsCube();
+		for (size_t i = 0; i < points.size(); i++) {
+			for (size_t j = i + 1; j < points.size(); j++) {
+				ofDrawLine(points[i], points[j]);
+			}
+		}
 
-    // enclosing circle
-    ofDrawCircle(flower.petals[0].getCenter(),
-        glm::distance(flower.petals[0].getCenter(), flower.petals.back().getCenter()) 
-            /*+ flower.petals[0].r*/);
-#endif
+		// enclosing circle
+		ofDrawCircle(flower.petals[0].getCenter(),
+					 glm::distance(flower.petals[0].getCenter(),
+								   flower.petals.back().getCenter())
+					 /*+ flower.petals[0].r*/);
+	}
 
 	if (saveSvg) {
 		ofEndSaveScreenAsSVG();
@@ -146,6 +162,10 @@ void ofApp::draw()
 	}
 	ofEndShape(false);
 #endif
+
+	if(!hideGui) {
+		gui.draw();
+	}
 
 	mCapFbo.end();
 	mCapFbo.draw(0, 0);
@@ -184,6 +204,10 @@ void ofApp::keyPressed(int key)
 			m_Recorder.setBitRate(8000);
 			m_Recorder.startCustomRecord();
 		}
+	} else if (key == 'h') {
+		hideGui = !hideGui;
+	} else if (key == 'q') {
+		ofExit();
 	}
 }
 
@@ -250,4 +274,19 @@ void ofApp::gotMessage(ofMessage msg)
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo)
 {
+}
+
+void ofApp::radiusChanged(int& r) {
+	flower.setRadius(r);
+	flower.generate(rounds);
+	size = r;
+}
+
+void ofApp::roundsChanged(int& r) {
+	flower.generate(r);
+}
+
+void ofApp::angleChanged(float& a) {
+	flower.setAngle(a);
+	flower.generate(rounds);
 }

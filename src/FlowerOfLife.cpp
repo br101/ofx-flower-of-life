@@ -6,6 +6,8 @@ void FlowerOfLife::generate(int rounds)
 	int num = 1;
 	int intersectWith = 0;
 
+	petals.clear();
+
 	/* first petal (number 0, round 0) is in the center */
 	petals.push_back(Petal(center_x, center_y, radius, 0, 0));
 

@@ -4,6 +4,7 @@
 #include "ofMain.h"
 #include "ofxBeat.h"
 #include "ofxFFmpegRecorder.h"
+#include "ofxGui.h"
 
 #define HIST_SIZE 200
 
@@ -29,6 +30,10 @@ public:
 	void gotMessage(ofMessage msg);
 	void audioIn(ofSoundBuffer& input);
 
+	void radiusChanged(int& r);
+	void roundsChanged(int& r);
+	void angleChanged(float& a);
+
 private:
 	FlowerOfLife flower;
 	bool paused;
@@ -36,6 +41,17 @@ private:
 	int size;
 	int sizeInc;
 	float smoothedVol;
+
+	ofParameter<int> radius;
+	ofParameter<int> rounds;
+	ofParameter<float> angle;
+	ofParameter<bool> showMeta;
+	ofParameter<bool> showEgg;
+	ofParameter<ofColor> colFill;
+	ofParameter<ofColor> colEgg;
+	ofParameter<ofColor> colOut;
+	ofxPanel gui;
+	bool hideGui;
 
 	ofSoundStream soundStream;
 
