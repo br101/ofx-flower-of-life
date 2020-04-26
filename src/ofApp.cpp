@@ -14,6 +14,10 @@ void ofApp::setup()
 	saveSvg = false;
 	size = 80;
 	sizeInc = 1;
+
+	flower.setAngle(30);
+	flower.setCenter(ofGetWidth() / 2, ofGetHeight() / 2);
+	flower.setRadius(size);
 	flower.generate(4);
 
 	ofSoundStreamSettings settings;

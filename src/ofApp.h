@@ -11,7 +11,7 @@ class ofApp : public ofBaseApp
 {
 
 public:
-	ofApp() : flower(512, 512, 80, 30) {}
+	ofApp() {}
 	void setup();
 	void update();
 	void draw();

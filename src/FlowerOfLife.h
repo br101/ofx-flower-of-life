@@ -34,6 +34,8 @@ public:
 class FlowerOfLife
 {
 public:
+	FlowerOfLife() : center_x(500), center_y(500), radius(80), angle(0) {}
+
 	FlowerOfLife(int center_x, int center_y, int radius, int angle)
 		: center_x(center_x), center_y(center_y), radius(radius), angle(angle)
 	{
@@ -82,6 +84,8 @@ public:
 
 	void setRadius(int r) { radius = r; }
 	int getRadius() { return radius; }
+
+	void setAngle(int a) { angle = a; }
 
 	void clear() { petals.clear(); }
 
