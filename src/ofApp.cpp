@@ -17,12 +17,23 @@ void ofApp::setup()
 	sizeInc = 1;
 	flower.generate(4);
 
-	ofSoundStreamSetup(0, 2); // 2 input channels
-	// ofSoundStreamSetup(0, 1, this, 44100, beat.getBufferSize(), 4);
+	ofSoundStreamSettings settings;
+	auto devices = soundStream.getMatchingDevices("default");
+	if(!devices.empty()){
+		settings.setInDevice(devices[0]);
+	}
+
+	settings.setInListener(this);
+	settings.sampleRate = 44100;
+	settings.numOutputChannels = 0;
+	settings.numInputChannels = 1;
+	settings.bufferSize = 256;
+	soundStream.setup(settings);
 
 	mCapFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
-	m_Recorder.setup(true, false, glm::vec2(ofGetWidth(), ofGetHeight()));
-	m_Recorder.setOverWrite(true);
+
+	//m_Recorder.setup(true, false, glm::vec2(ofGetWidth(), ofGetHeight()));
+	//m_Recorder.setOverWrite(true);
 }
 
 //--------------------------------------------------------------

@@ -38,6 +38,8 @@ private:
 	int sizeInc;
 	float smoothedVol;
 
+	ofSoundStream soundStream;
+
 	ofFbo mCapFbo;
 	ofPixels mPix;
 	ofxFFmpegRecorder m_Recorder;
