@@ -81,6 +81,7 @@ public:
 	}
 
 	void setRadius(int r) { radius = r; }
+	int getRadius() { return radius; }
 
 	void clear() { petals.clear(); }
 

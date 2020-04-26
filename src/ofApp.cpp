@@ -12,8 +12,7 @@ void ofApp::setup()
 	ofSetLineWidth(1);
 	paused = true;
 	saveSvg = false;
-	normSize = 80;
-	size = normSize;
+	size = 80;
 	sizeInc = 1;
 	flower.generate(4);
 
@@ -42,7 +41,7 @@ void ofApp::update()
 	if (paused)
 		return;
 
-	size = normSize * smoothedVol * 50;
+	size = flower.getRadius() * smoothedVol * 50;
 	// size = normSize * beat.kick();
 	/*
 		size += sizeInc;
@@ -162,7 +161,7 @@ void ofApp::keyPressed(int key)
 		paused = !paused;
 	else if (key == 'r') {
 		paused = true;
-		size = normSize;
+		size = flower.getRadius();
 	} else if (key == 'S') {
 		ofImage img;
 		img.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
@@ -234,8 +233,7 @@ void ofApp::windowResized(int w, int h)
 {
 	ofLog(OF_LOG_NOTICE, "resized %d %d", w, h);
 	flower.setCenter(w / 2, h / 2);
-	normSize = h / 2 / 5;
-	flower.setRadius(normSize);
+	flower.setRadius(h / 2 / 5);
 	flower.clear();
 	flower.generate(4);
 }
