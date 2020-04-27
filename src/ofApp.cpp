@@ -1,6 +1,5 @@
 #include "ofApp.h"
 #include "circle.h"
-#include <iostream>
 
 //--------------------------------------------------------------
 void ofApp::setup()
@@ -9,34 +8,11 @@ void ofApp::setup()
 	ofEnableAntiAliasing();
 	ofEnableAlphaBlending();
 	ofSetCircleResolution(72);
-	ofSetLineWidth(1);
+
 	paused = true;
 	saveSvg = false;
-	size = 80;
-	sizeInc = 1;
 	hideGui = false;
-
-	radius.addListener(this, &ofApp::radiusChanged);
-	rounds.addListener(this, &ofApp::roundsChanged);
-	angle.addListener(this, &ofApp::angleChanged);
-
-	flower.setAngle(30);
-	flower.setCenter(ofGetWidth() / 2, ofGetHeight() / 2);
-	flower.setRadius(size);
-	flower.generate(4);
-
-	ofSoundStreamSettings settings;
-	auto devices = soundStream.getMatchingDevices("default");
-	if(!devices.empty()){
-		settings.setInDevice(devices[0]);
-	}
-
-	settings.setInListener(this);
-	settings.sampleRate = 44100;
-	settings.numOutputChannels = 0;
-	settings.numInputChannels = 1;
-	settings.bufferSize = 256;
-	soundStream.setup(settings);
+	sizeInc = 1;
 
 	flowParams.setName("flower of life");
 	flowParams.add(radius.set("radius", 80, 10, 300));
@@ -45,9 +21,9 @@ void ofApp::setup()
 
 	drawParams.setName("drawing");
 	drawParams.add(showMeta.set("metatrons cube", false));
-	drawParams.add(showEgg.set("show egg", true));
+	drawParams.add(showEgg.set("show egg", false));
 	drawParams.add(colPetalNum.set("color by petal num", true));
-	drawParams.add(colRound.set("color by round", true));
+	drawParams.add(colRound.set("color by round", false));
 	drawParams.add(colFill.set("fill color", ofColor::yellow, ofColor(0,0,0,0), ofColor(255,255,255,255)));
 	drawParams.add(colEgg.set("egg color", ofColor::orange, ofColor(0,0,0,0), ofColor(255,255,255,255)));
 	drawParams.add(colOut.set("outline color", ofColor::gray, ofColor(0,0,0,0), ofColor(255,255,255,255)));
@@ -58,13 +34,37 @@ void ofApp::setup()
 	gui.setup("settings");
 	gui.add(flowParams);
 	gui.add(drawParams);
+
+	radius.addListener(this, &ofApp::radiusChanged);
+	rounds.addListener(this, &ofApp::roundsChanged);
+	angle.addListener(this, &ofApp::angleChanged);
+
+	flower.setAngle(angle);
+	flower.setCenter(ofGetWidth() / 2, ofGetHeight() / 2);
+	flower.setRadius(radius);
+	flower.generate(rounds);
+	size = radius;
+
+	/* sound input */
+	ofSoundStreamSettings settings;
+	auto devices = soundStream.getMatchingDevices("default");
+	if (!devices.empty()){
+		settings.setInDevice(devices[0]);
+	}
+	settings.setInListener(this);
+	settings.sampleRate = 44100;
+	settings.numOutputChannels = 0;
+	settings.numInputChannels = 1;
+	settings.bufferSize = 256;
+	soundStream.setup(settings);
 }
 
 //--------------------------------------------------------------
 void ofApp::update()
 {
-	if (paused)
+	if (paused) {
 		return;
+	}
 
 	size = flower.getRadius() * smoothedVol * 50;
 
@@ -93,7 +93,6 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-
 	if (saveSvg) {
 		ofBeginSaveScreenAsSVG("flower.svg");
 	}
@@ -121,8 +120,8 @@ void ofApp::draw()
 			}
 		}
 		ofDrawCircle(p.getCenter(), size);
-		// ofSetColor(0);
-		// ofDrawBitmapString(to_string(p.num), p.getCenter());
+		//ofSetColor(0);
+		//ofDrawBitmapString(to_string(p.num), p.getCenter());
 	}
 
 	// flower: outlines
@@ -145,15 +144,19 @@ void ofApp::draw()
 		}
 
 		// enclosing circle
-		ofDrawCircle(petals[0].getCenter(),
-					 glm::distance(petals[0].getCenter(),
-								   petals.back().getCenter())
-					 /*+ flower.petals[0].r*/);
+		ofDrawCircle(
+			petals[0].getCenter(),
+			glm::distance(petals[0].getCenter(), petals.back().getCenter())
+			/*+ flower.petals[0].r*/);
 	}
 
 	if (saveSvg) {
 		ofEndSaveScreenAsSVG();
 		saveSvg = false;
+	}
+
+	if (!hideGui) {
+		gui.draw();
 	}
 
 #if 0
@@ -179,31 +182,33 @@ void ofApp::draw()
 	}
 	ofEndShape(false);
 #endif
-
-	if(!hideGui) {
-		gui.draw();
-	}
 }
 
-//--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-	if (key == ' ')
+	switch (key) {
+	case ' ':
 		paused = !paused;
-	else if (key == 'r') {
+		break;
+	case 'r':
 		paused = true;
 		size = flower.getRadius();
-	} else if (key == 'S') {
+		break;
+	case 'S': {
 		ofImage img;
 		img.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
 		img.save("screenshot.png");
-	} else if (key == 's') {
+		}; break;
+	case 's':
 		saveSvg = true;
-	} else if (key == 'f') {
+		break;
+	case 'f':
 		ofToggleFullscreen();
-	} else if (key == 'h') {
+		break;
+	case 'h':
 		hideGui = !hideGui;
-	} else if (key == 'q') {
+		break;
+	case 'q':
 		ofExit();
 	}
 }
@@ -218,42 +223,6 @@ void ofApp::audioIn(ofSoundBuffer& input)
 					   input.getNumChannels());
 }
 
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key)
-{
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y)
-{
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button)
-{
-}
-
-//--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button)
-{
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button)
-{
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y)
-{
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y)
-{
-}
-
-//--------------------------------------------------------------
 void ofApp::windowResized(int w, int h)
 {
 	ofLog(OF_LOG_NOTICE, "resized %d %d", w, h);
@@ -261,16 +230,6 @@ void ofApp::windowResized(int w, int h)
 	flower.setRadius(h / 2 / 5);
 	flower.clear();
 	flower.generate(4);
-}
-
-//--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg)
-{
-}
-
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo)
-{
 }
 
 void ofApp::radiusChanged(int& r) {

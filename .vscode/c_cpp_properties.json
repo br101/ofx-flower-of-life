@@ -3,7 +3,7 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/src/*",
                 "/usr/include/**",
 				"~/dev/ofx/of_v0.11.0_linux64gcc6_release/libs/**",
 				"~/dev/ofx/of_v0.11.0_linux64gcc6_release/addons/**"
