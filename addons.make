@@ -1,4 +1,2 @@
-ofxVectorGraphics
-ofxFFmpegRecorder
 ofxBeat
 ofxGui

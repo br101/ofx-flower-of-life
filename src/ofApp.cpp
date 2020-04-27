@@ -38,8 +38,6 @@ void ofApp::setup()
 	settings.bufferSize = 256;
 	soundStream.setup(settings);
 
-	mCapFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
-
 	flowParams.setName("flower of life");
 	flowParams.add(radius.set("radius", 80, 10, 300));
 	flowParams.add(rounds.set("rounds", 4, 1, 50));
@@ -57,12 +55,9 @@ void ofApp::setup()
 	drawParams.add(opacFill.set("opacity norm", 20, 0, 100));
 	drawParams.add(opacEgg.set("opacity egg", 60, 0, 100));
 
-
 	gui.setup("settings");
 	gui.add(flowParams);
 	gui.add(drawParams);
-	//m_Recorder.setup(true, false, glm::vec2(ofGetWidth(), ofGetHeight()));
-	//m_Recorder.setOverWrite(true);
 }
 
 //--------------------------------------------------------------
@@ -102,8 +97,6 @@ void ofApp::draw()
 	if (saveSvg) {
 		ofBeginSaveScreenAsSVG("flower.svg");
 	}
-
-	mCapFbo.begin();
 
 	ofBackground(255);
 
@@ -190,16 +183,6 @@ void ofApp::draw()
 	if(!hideGui) {
 		gui.draw();
 	}
-
-	mCapFbo.end();
-	mCapFbo.draw(0, 0);
-
-	if (m_Recorder.isRecording()) {
-		mCapFbo.readToPixels(mPix);
-		if (mPix.getWidth() > 0 && mPix.getHeight() > 0) {
-			m_Recorder.addFrame(mPix);
-		}
-	}
 }
 
 //--------------------------------------------------------------
@@ -218,16 +201,6 @@ void ofApp::keyPressed(int key)
 		saveSvg = true;
 	} else if (key == 'f') {
 		ofToggleFullscreen();
-	} else if (key == 'a') {
-		if (m_Recorder.isRecording()) {
-			m_Recorder.stop();
-		} else {
-			m_Recorder.setOutputPath(
-				ofToDataPath(ofGetTimestampString() + ".avi", true));
-			m_Recorder.setVideoCodec("libx264");
-			m_Recorder.setBitRate(8000);
-			m_Recorder.startCustomRecord();
-		}
 	} else if (key == 'h') {
 		hideGui = !hideGui;
 	} else if (key == 'q') {

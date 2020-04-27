@@ -3,7 +3,6 @@
 #include "FlowerOfLife.h"
 #include "ofMain.h"
 #include "ofxBeat.h"
-#include "ofxFFmpegRecorder.h"
 #include "ofxGui.h"
 
 #define HIST_SIZE 200
@@ -63,10 +62,6 @@ private:
 	bool hideGui;
 
 	ofSoundStream soundStream;
-
-	ofFbo mCapFbo;
-	ofPixels mPix;
-	ofxFFmpegRecorder m_Recorder;
 
 	ofxBeat beat;
 	vector<float> histL;
