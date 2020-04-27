@@ -45,11 +45,20 @@ private:
 	ofParameter<int> radius;
 	ofParameter<int> rounds;
 	ofParameter<float> angle;
+	ofParameterGroup flowParams;
+
 	ofParameter<bool> showMeta;
 	ofParameter<bool> showEgg;
+	ofParameter<bool> colPetalNum;
+	ofParameter<bool> colRound;
 	ofParameter<ofColor> colFill;
 	ofParameter<ofColor> colEgg;
 	ofParameter<ofColor> colOut;
+	ofParameter<int> lineWidth;
+	ofParameter<int> opacFill;
+	ofParameter<int> opacEgg;
+	ofParameterGroup drawParams;
+
 	ofxPanel gui;
 	bool hideGui;
 

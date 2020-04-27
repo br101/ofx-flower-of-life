@@ -87,11 +87,19 @@ public:
 
 	void setAngle(int a) { angle = a; }
 
+	int getNumPetals() { return petals.size(); }
+
+	int getNumRounds() { return rounds; }
+
+	std::vector<Petal>& getPetals() { return petals; }
+
 	void clear() { petals.clear(); }
 
+private:
 	int center_x;
 	int center_y;
 	int radius;
 	int angle;
+	int rounds;
 	std::vector<Petal> petals;
 };

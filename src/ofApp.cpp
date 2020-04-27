@@ -40,16 +40,27 @@ void ofApp::setup()
 
 	mCapFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
 
-	gui.setup("settings");
-	gui.add(radius.set("radius", 80, 10, 300));
-	gui.add(rounds.set("rounds", 4, 1, 50));
-	gui.add(angle.set("angle", 0, 1, 90));
-	gui.add(showMeta.set("metatrons cube", false));
-	gui.add(showEgg.set("show egg", true));
-	gui.add(colFill.set("fill color", ofColor::yellow, ofColor(0,0,0,0), ofColor(255,255,255,255)));
-	gui.add(colEgg.set("egg color", ofColor::orange, ofColor(0,0,0,0), ofColor(255,255,255,255)));
-	gui.add(colOut.set("outline color", ofColor::gray, ofColor(0,0,0,0), ofColor(255,255,255,255)));
+	flowParams.setName("flower of life");
+	flowParams.add(radius.set("radius", 80, 10, 300));
+	flowParams.add(rounds.set("rounds", 4, 1, 50));
+	flowParams.add(angle.set("angle", 0, 1, 90));
 
+	drawParams.setName("drawing");
+	drawParams.add(showMeta.set("metatrons cube", false));
+	drawParams.add(showEgg.set("show egg", true));
+	drawParams.add(colPetalNum.set("color by petal num", true));
+	drawParams.add(colRound.set("color by round", true));
+	drawParams.add(colFill.set("fill color", ofColor::yellow, ofColor(0,0,0,0), ofColor(255,255,255,255)));
+	drawParams.add(colEgg.set("egg color", ofColor::orange, ofColor(0,0,0,0), ofColor(255,255,255,255)));
+	drawParams.add(colOut.set("outline color", ofColor::gray, ofColor(0,0,0,0), ofColor(255,255,255,255)));
+	drawParams.add(lineWidth.set("line width", 1, 0, 7));
+	drawParams.add(opacFill.set("opacity norm", 20, 0, 100));
+	drawParams.add(opacEgg.set("opacity egg", 60, 0, 100));
+
+
+	gui.setup("settings");
+	gui.add(flowParams);
+	gui.add(drawParams);
 	//m_Recorder.setup(true, false, glm::vec2(ofGetWidth(), ofGetHeight()));
 	//m_Recorder.setOverWrite(true);
 }
@@ -61,6 +72,7 @@ void ofApp::update()
 		return;
 
 	size = flower.getRadius() * smoothedVol * 50;
+
 	// size = normSize * beat.kick();
 	/*
 		size += sizeInc;
@@ -95,13 +107,25 @@ void ofApp::draw()
 
 	ofBackground(255);
 
+	vector<Petal>& petals = flower.getPetals();
+
 	// flower: fill
 	ofFill();
-	for (auto& p : flower.petals) {
+	for (auto& p : petals) {
 		if (showEgg && p.isPartOfFruit()) {
-			ofSetColor(colEgg, 60);
+			ofSetColor(colEgg, opacEgg);
 		} else {
-			ofSetColor(colFill, 20);
+			if (colPetalNum) {
+				ofColor colFill2 = ofColor::blue;
+				colFill2.setHueAngle(360.0 / flower.getNumPetals() * p.num);
+				ofSetColor(colFill2, opacFill);
+			} else if (colRound) {
+				ofColor colFill2 = ofColor::blue;
+				colFill2.setHueAngle(360.0 / flower.getNumRounds() * p.round);
+				ofSetColor(colFill2, opacFill);
+			} else {
+				ofSetColor(colFill, opacFill);
+			}
 		}
 		ofDrawCircle(p.getCenter(), size);
 		// ofSetColor(0);
@@ -111,8 +135,8 @@ void ofApp::draw()
 	// flower: outlines
 	ofNoFill();
 	ofSetColor(colOut);
-	ofSetLineWidth(1);
-	for (auto& p : flower.petals) {
+	ofSetLineWidth(lineWidth);
+	for (auto& p : petals) {
 		ofDrawCircle(p.getCenter(), size);
 	}
 
@@ -128,9 +152,9 @@ void ofApp::draw()
 		}
 
 		// enclosing circle
-		ofDrawCircle(flower.petals[0].getCenter(),
-					 glm::distance(flower.petals[0].getCenter(),
-								   flower.petals.back().getCenter())
+		ofDrawCircle(petals[0].getCenter(),
+					 glm::distance(petals[0].getCenter(),
+								   petals.back().getCenter())
 					 /*+ flower.petals[0].r*/);
 	}
 
