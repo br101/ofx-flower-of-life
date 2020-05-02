@@ -57,6 +57,13 @@ void ofApp::setup()
 	settings.numInputChannels = 1;
 	settings.bufferSize = 256;
 	soundStream.setup(settings);
+
+	rabbit.setApplicationId("ofx rabbit server");
+	rabbit.addTransporter(transporter);
+	transporter.bind(10000);
+	rabbit.expose(flowParams);
+	rabbit.expose(drawParams);
+	rabbit.update();
 }
 
 //--------------------------------------------------------------

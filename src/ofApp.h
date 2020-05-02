@@ -4,6 +4,7 @@
 #include "ofMain.h"
 #include "ofxBeat.h"
 #include "ofxGui.h"
+#include "ofxRabbitControl.h"
 
 #define HIST_SIZE 200
 
@@ -53,6 +54,9 @@ private:
 	bool hideGui;
 
 	ofSoundStream soundStream;
+
+	ofxRabbitControlServer rabbit;
+	websocketServerTransporter transporter;
 
 	ofxBeat beat;
 	vector<float> histL;

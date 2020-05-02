@@ -1,2 +1,3 @@
 ofxBeat
 ofxGui
+ofxRabbitControl
