@@ -2,11 +2,9 @@
 
 #include "FlowerOfLife.h"
 #include "ofMain.h"
-#include "ofxBeat.h"
+#include "ofxAubio.h"
 #include "ofxGui.h"
 #include "ofxRabbitControl.h"
-
-#define HIST_SIZE 200
 
 class ofApp : public ofBaseApp
 {
@@ -24,6 +22,8 @@ public:
 	void radiusChanged(int& r);
 	void roundsChanged(int& r);
 	void angleChanged(float& a);
+	void onsetEvent(float& time);
+	void beatEvent(float& time);
 
 private:
 	FlowerOfLife flower;
@@ -58,8 +58,25 @@ private:
 	ofxRabbitControlServer rabbit;
 	websocketServerTransporter transporter;
 
-	ofxBeat beat;
-	vector<float> histL;
-	vector<float> histM;
-	vector<float> histH;
+	bool showAudio;
+	ofxAubioOnset onset;
+	ofxAubioPitch pitch;
+	ofxAubioBeat beat;
+	ofxAubioMelBands bands;
+
+	ofxPanel pitchGui;
+	ofxFloatSlider midiPitch;
+	ofxFloatSlider pitchConfidence;
+
+	ofxPanel beatGui;
+	bool gotBeat;
+	ofxFloatSlider bpm;
+
+	ofxPanel onsetGui;
+	bool gotOnset;
+	ofxFloatSlider onsetThreshold;
+	ofxFloatSlider onsetNovelty;
+	ofxFloatSlider onsetThresholdedNovelty;
+
+	ofPolyline bandPlot;
 };

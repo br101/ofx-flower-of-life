@@ -77,6 +77,7 @@ OF_ROOT = /home/br1/dev/ofx/of
 # incorporated directly into the final executable application binary.
 ################################################################################
 # PROJECT_LDFLAGS=-Wl,-rpath=./libs
+PROJECT_LDFLAGS=-laubio
 
 ################################################################################
 # PROJECT DEFINES

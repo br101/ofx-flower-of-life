@@ -1,3 +1,3 @@
-ofxBeat
+ofxAubio
 ofxGui
 ofxRabbitControl

@@ -12,6 +12,7 @@ void ofApp::setup()
 	paused = true;
 	saveSvg = false;
 	hideGui = false;
+	showAudio = true;
 	sizeInc = 1;
 
 	flowParams.setName("flower of life");
@@ -24,9 +25,14 @@ void ofApp::setup()
 	drawParams.add(showEgg.set("show egg", false));
 	drawParams.add(colPetalNum.set("color by petal num", true));
 	drawParams.add(colRound.set("color by round", false));
-	drawParams.add(colFill.set("fill color", ofColor::yellow, ofColor(0,0,0,0), ofColor(255,255,255,255)));
-	drawParams.add(colEgg.set("egg color", ofColor::orange, ofColor(0,0,0,0), ofColor(255,255,255,255)));
-	drawParams.add(colOut.set("outline color", ofColor::gray, ofColor(0,0,0,0), ofColor(255,255,255,255)));
+	drawParams.add(colFill.set("fill color", ofColor::yellow,
+							   ofColor(0, 0, 0, 0),
+							   ofColor(255, 255, 255, 255)));
+	drawParams.add(colEgg.set("egg color", ofColor::orange, ofColor(0, 0, 0, 0),
+							  ofColor(255, 255, 255, 255)));
+	drawParams.add(colOut.set("outline color", ofColor::gray,
+							  ofColor(0, 0, 0, 0),
+							  ofColor(255, 255, 255, 255)));
 	drawParams.add(lineWidth.set("line width", 1, 0, 7));
 	drawParams.add(opacFill.set("opacity norm", 20, 0, 100));
 	drawParams.add(opacEgg.set("opacity egg", 60, 0, 100));
@@ -45,10 +51,17 @@ void ofApp::setup()
 	flower.generate(rounds);
 	size = radius;
 
+	onset.setup();
+	pitch.setup();
+	beat.setup();
+	bands.setup();
+	ofAddListener(onset.gotOnset, this, &ofApp::onsetEvent);
+	ofAddListener(beat.gotBeat, this, &ofApp::beatEvent);
+
 	/* sound input */
 	ofSoundStreamSettings settings;
 	auto devices = soundStream.getMatchingDevices("default");
-	if (!devices.empty()){
+	if (!devices.empty()) {
 		settings.setInDevice(devices[0]);
 	}
 	settings.setInListener(this);
@@ -57,6 +70,28 @@ void ofApp::setup()
 	settings.numInputChannels = 1;
 	settings.bufferSize = 256;
 	soundStream.setup(settings);
+
+	// setup the aubio gui objects
+	int start = 20;
+	int starty = 800;
+	beatGui.setup("ofxAubioBeat", "settings.xml", start + 10, starty);
+	beatGui.add(bpm.setup("bpm", 0, 0, 250));
+
+	start += 250;
+	onsetGui.setup("ofxAubioOnset", "settings.xml", start + 10, starty);
+	onsetGui.add(onsetThreshold.setup("threshold", 0, 0, 2));
+	onsetGui.add(onsetNovelty.setup("onset novelty", 0, 0, 10000));
+	onsetGui.add(onsetThresholdedNovelty.setup("thr. novelty", 0, -1000, 1000));
+	onsetThreshold = onset.threshold;
+
+	start += 250;
+	pitchGui.setup("ofxAubioPitch", "settings.xml", start + 10, starty);
+	pitchGui.add(midiPitch.setup("midi pitch", 0, 0, 128));
+	pitchGui.add(pitchConfidence.setup("confidence", 0, 0, 1));
+
+	for (int i = 0; i < 40; i++) {
+		bandPlot.addVertex(50 + i * 650 / 40., starty + 240 - 100 * bands.energies[i]);
+	}
 
 	rabbit.setApplicationId("ofx rabbit server");
 	rabbit.addTransporter(transporter);
@@ -74,6 +109,7 @@ void ofApp::update()
 	}
 
 	size = flower.getRadius() * smoothedVol * 50;
+	onset.setThreshold(onsetThreshold);
 
 	// size = normSize * beat.kick();
 	/*
@@ -84,17 +120,6 @@ void ofApp::update()
 			sizeInc = -1;
 		}
 	*/
-	beat.update(ofGetElapsedTimeMillis());
-
-	histL.push_back(beat.kick());
-	histM.push_back(beat.snare());
-	histH.push_back(beat.hihat());
-
-	if (histL.size() >= HIST_SIZE) {
-		histL.erase(histL.begin(), histL.begin() + 1);
-		histM.erase(histM.begin(), histM.begin() + 1);
-		histH.erase(histH.begin(), histH.begin() + 1);
-	}
 }
 
 //--------------------------------------------------------------
@@ -166,29 +191,38 @@ void ofApp::draw()
 		gui.draw();
 	}
 
-#if 0
-    ofDrawBitmapString(to_string(smoothedVol), 20, 20);
-    ofDrawBitmapString(to_string(beat.kick()), 20, 40);
+	if (showAudio) {
+		ofFill();
+		if (gotBeat) {
+			ofSetColor(ofColor::green);
+			ofDrawRectangle(20, 850, 50, 50);
+			gotBeat = false;
+		}
 
-    ofSetLineWidth(1);
-	ofBeginShape();
-	for (unsigned int i = 0; i < histL.size(); i++){
-		ofVertex(i*2, 100 - histL[i]*100.0f);
-	}
-	ofEndShape(false);
+		if (gotOnset) {
+			ofSetColor(ofColor::red);
+			ofDrawRectangle(70, 850, 50, 50);
+			gotOnset = false;
+		}
+		onsetNovelty = onset.novelty;
+		onsetThresholdedNovelty = onset.thresholdedNovelty;
 
-    ofBeginShape();
-	for (unsigned int i = 0; i < histM.size(); i++){
-		ofVertex(i*2, 200 - histM[i]*100.0f);
-	}
-	ofEndShape(false);
+		pitchConfidence = pitch.pitchConfidence;
+		if (pitch.latestPitch)
+			midiPitch = pitch.latestPitch;
+		bpm = beat.bpm;
 
-    ofBeginShape();
-	for (unsigned int i = 0; i < histH.size(); i++){
-		ofVertex(i*2, 300 - histH[i]*100.0f);
+		pitchGui.draw();
+		beatGui.draw();
+		onsetGui.draw();
+
+		ofSetColor(ofColor::orange);
+		ofSetLineWidth(3.);
+		for (size_t i = 0; i < bandPlot.size(); i++) {
+			bandPlot[i].y = 990 - 100 * bands.energies[i];
+		}
+		bandPlot.draw();
 	}
-	ofEndShape(false);
-#endif
 }
 
 void ofApp::keyPressed(int key)
@@ -215,6 +249,9 @@ void ofApp::keyPressed(int key)
 	case 'h':
 		hideGui = !hideGui;
 		break;
+	case 'a':
+		showAudio = !showAudio;
+		break;
 	case 'q':
 		ofExit();
 	}
@@ -226,8 +263,20 @@ void ofApp::audioIn(ofSoundBuffer& input)
 	smoothedVol += 0.07 * input.getRMSAmplitude();
 	// smoothedVol = curVol;
 
-	beat.audioReceived(input.getBuffer().data(), input.size(),
-					   input.getNumChannels());
+	onset.audioIn(input.getBuffer().data(), input.size(), input.getNumChannels());
+	pitch.audioIn(input.getBuffer().data(), input.size(), input.getNumChannels());
+	beat.audioIn(input.getBuffer().data(), input.size(), input.getNumChannels());
+	bands.audioIn(input.getBuffer().data(), input.size(), input.getNumChannels());
+}
+
+void ofApp::onsetEvent(float & time) {
+    //ofLog() << "got onset at " << time << " s";
+    gotOnset = true;
+}
+
+void ofApp::beatEvent(float & time) {
+    //ofLog() << "got beat at " << time << " s";
+    gotBeat = true;
 }
 
 void ofApp::windowResized(int w, int h)
