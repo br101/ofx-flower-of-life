@@ -51,6 +51,7 @@ void ofApp::setup()
 	flower.generate(rounds);
 	size = radius;
 
+	/* aubio objects: have to be before sound input setup */
 	onset.setup();
 	pitch.setup();
 	beat.setup();
@@ -111,6 +112,11 @@ void ofApp::update()
 	size = flower.getRadius() * smoothedVol * 50;
 	onset.setThreshold(onsetThreshold);
 
+	// this will recalculate flower
+	//if (pitch.pitchConfidence > 0.5) {
+	//	angle = pitch.latestPitch;
+	//}
+
 	// size = normSize * beat.kick();
 	/*
 		size += sizeInc;
@@ -142,6 +148,7 @@ void ofApp::draw()
 			if (colPetalNum) {
 				ofColor colFill2 = ofColor::blue;
 				colFill2.setHueAngle(360.0 / flower.getNumPetals() * p.num);
+				//colFill2.setSaturation(255.0 * smoothedVol * 50);
 				ofSetColor(colFill2, opacFill);
 			} else if (colRound) {
 				ofColor colFill2 = ofColor::blue;
