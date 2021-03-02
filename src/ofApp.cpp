@@ -23,7 +23,6 @@ void ofApp::setup()
 	drawParams.setName("drawing");
 	drawParams.add(showMeta.set("metatrons cube", false));
 	drawParams.add(showEgg.set("show egg", false));
-	drawParams.add(showRotate.set("rotate", true));
 	drawParams.add(colPetalNum.set("color by petal num", true));
 	drawParams.add(colRound.set("color by round", false));
 	drawParams.add(colFill.set("fill color", ofColor::yellow,
@@ -37,11 +36,16 @@ void ofApp::setup()
 	drawParams.add(lineWidth.set("line width", 1, 0, 7));
 	drawParams.add(opacFill.set("opacity norm", 20, 0, 100));
 	drawParams.add(opacEgg.set("opacity egg", 60, 0, 100));
-	drawParams.add(smoothFactor.set("smoothing factor", 0.93, 0, 1.0));
+
+	animParams.setName("animation");
+	animParams.add(showRotate.set("rotate", true));
+	animParams.add(volFactor.set("volume factor", 50, 0, 200));
+	animParams.add(smoothFactor.set("smoothing factor", 0.93, 0, 1.0));
 
 	gui.setup("settings");
 	gui.add(flowParams);
 	gui.add(drawParams);
+	gui.add(animParams);
 
 	radius.addListener(this, &ofApp::radiusChanged);
 	rounds.addListener(this, &ofApp::roundsChanged);
@@ -109,7 +113,12 @@ void ofApp::update()
 		return;
 	}
 
-	size = flower.getRadius() * smoothedVol * 50;
+	if (volFactor > 0) {
+		size = flower.getRadius() * smoothedVol * volFactor;
+	} else {
+		size = radius;
+	}
+
 	onset.setThreshold(onsetThreshold);
 
 	if (showRotate) { //pitch.pitchConfidence > 0.5) {

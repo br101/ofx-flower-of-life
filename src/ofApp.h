@@ -40,7 +40,6 @@ private:
 
 	ofParameter<bool> showMeta;
 	ofParameter<bool> showEgg;
-	ofParameter<bool> showRotate;
 	ofParameter<bool> colPetalNum;
 	ofParameter<bool> colRound;
 	ofParameter<ofColor> colFill;
@@ -49,8 +48,12 @@ private:
 	ofParameter<int> lineWidth;
 	ofParameter<int> opacFill;
 	ofParameter<int> opacEgg;
-	ofParameter<float> smoothFactor;
 	ofParameterGroup drawParams;
+
+	ofParameter<bool> showRotate;
+	ofParameter<float> volFactor;
+	ofParameter<float> smoothFactor;
+	ofParameterGroup animParams;
 
 	ofxPanel gui;
 	bool hideGui;
