@@ -36,6 +36,7 @@ void ofApp::setup()
 	drawParams.add(lineWidth.set("line width", 1, 0, 7));
 	drawParams.add(opacFill.set("opacity norm", 20, 0, 100));
 	drawParams.add(opacEgg.set("opacity egg", 60, 0, 100));
+	drawParams.add(smoothFactor.set("smoothing factor", 0.93, 0, 1.0));
 
 	gui.setup("settings");
 	gui.add(flowParams);
@@ -135,7 +136,7 @@ void ofApp::draw()
 		ofBeginSaveScreenAsSVG("flower.svg");
 	}
 
-	ofBackground(255);
+	ofBackground(0);
 
 	vector<Petal>& petals = flower.getPetals();
 
@@ -266,9 +267,9 @@ void ofApp::keyPressed(int key)
 
 void ofApp::audioIn(ofSoundBuffer& input)
 {
-	smoothedVol *= 0.93;
-	smoothedVol += 0.07 * input.getRMSAmplitude();
-	// smoothedVol = curVol;
+	smoothedVol *= smoothFactor;
+	smoothedVol += (1.0 - smoothFactor) * input.getRMSAmplitude();
+	//smoothedVol = input.getRMSAmplitude();
 
 	onset.audioIn(input.getBuffer().data(), input.size(), input.getNumChannels());
 	pitch.audioIn(input.getBuffer().data(), input.size(), input.getNumChannels());

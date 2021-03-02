@@ -48,6 +48,7 @@ private:
 	ofParameter<int> lineWidth;
 	ofParameter<int> opacFill;
 	ofParameter<int> opacEgg;
+	ofParameter<float> smoothFactor;
 	ofParameterGroup drawParams;
 
 	ofxPanel gui;
