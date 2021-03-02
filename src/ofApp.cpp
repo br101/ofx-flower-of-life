@@ -167,16 +167,18 @@ void ofApp::draw()
 	}
 
 	// flower: outlines
-	ofNoFill();
-	ofSetColor(colOut);
-	ofSetLineWidth(lineWidth);
-	for (auto& p : petals) {
-		ofDrawCircle(p.getCenter(), size);
+	if (lineWidth > 0) {
+		ofNoFill();
+		ofSetColor(colOut);
+		ofSetLineWidth(lineWidth);
+		for (auto& p : petals) {
+			ofDrawCircle(p.getCenter(), size);
+		}
 	}
 
 	if (showMeta) {
 		// metatrons cube
-		ofSetColor(0);
+		ofSetColor(colOut);
 		ofSetLineWidth(3);
 		vector<glm::vec2> points = flower.getMetatronsCube();
 		for (size_t i = 0; i < points.size(); i++) {
