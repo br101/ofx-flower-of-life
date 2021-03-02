@@ -18,11 +18,12 @@ void ofApp::setup()
 	flowParams.setName("flower of life");
 	flowParams.add(radius.set("radius", 80, 10, 300));
 	flowParams.add(rounds.set("rounds", 4, 1, 50));
-	flowParams.add(angle.set("angle", 0, 1, 90));
+	flowParams.add(angle.set("angle", 0, 1, 60));
 
 	drawParams.setName("drawing");
 	drawParams.add(showMeta.set("metatrons cube", false));
 	drawParams.add(showEgg.set("show egg", false));
+	drawParams.add(showRotate.set("rotate", true));
 	drawParams.add(colPetalNum.set("color by petal num", true));
 	drawParams.add(colRound.set("color by round", false));
 	drawParams.add(colFill.set("fill color", ofColor::yellow,
@@ -44,10 +45,8 @@ void ofApp::setup()
 
 	radius.addListener(this, &ofApp::radiusChanged);
 	rounds.addListener(this, &ofApp::roundsChanged);
-	angle.addListener(this, &ofApp::angleChanged);
 
-	flower.setAngle(angle);
-	flower.setCenter(ofGetWidth() / 2, ofGetHeight() / 2);
+	flower.setCenter(0,0);
 	flower.setRadius(radius);
 	flower.generate(rounds);
 	size = radius;
@@ -113,10 +112,9 @@ void ofApp::update()
 	size = flower.getRadius() * smoothedVol * 50;
 	onset.setThreshold(onsetThreshold);
 
-	// this will recalculate flower
-	//if (pitch.pitchConfidence > 0.5) {
-	//	angle = pitch.latestPitch;
-	//}
+	if (showRotate) { //pitch.pitchConfidence > 0.5) {
+		angle = pitch.latestPitch;
+	}
 
 	// size = normSize * beat.kick();
 	/*
@@ -137,6 +135,10 @@ void ofApp::draw()
 	}
 
 	ofBackground(0);
+
+	ofPushMatrix();
+	ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
+	ofRotateZDeg(angle);
 
 	vector<Petal>& petals = flower.getPetals();
 
@@ -194,6 +196,8 @@ void ofApp::draw()
 		ofEndSaveScreenAsSVG();
 		saveSvg = false;
 	}
+
+	ofPopMatrix();
 
 	if (!hideGui) {
 		gui.draw();
@@ -304,9 +308,4 @@ void ofApp::radiusChanged(int& r) {
 
 void ofApp::roundsChanged(int& r) {
 	flower.generate(r);
-}
-
-void ofApp::angleChanged(float& a) {
-	flower.setAngle(a);
-	flower.generate(rounds);
 }

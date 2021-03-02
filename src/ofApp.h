@@ -40,6 +40,7 @@ private:
 
 	ofParameter<bool> showMeta;
 	ofParameter<bool> showEgg;
+	ofParameter<bool> showRotate;
 	ofParameter<bool> colPetalNum;
 	ofParameter<bool> colRound;
 	ofParameter<ofColor> colFill;
